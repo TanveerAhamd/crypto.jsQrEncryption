@@ -1,0 +1,185 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f0f4f7;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #imgBox {
+      margin-top: 30px;
+      display: none;
+    }
+
+    #qrImage {
+      border: 5px solid #007bff;
+      padding: 10px;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>QR Code Generator</h1>
+
+  <input type="text" id="qrText" placeholder="Enter text or URL" />
+  <button onclick="generateQR()">Generate QR</button>
+
+  <div id="imgBox">
+    <img id="qrImage" src="" alt="QR Code" />
+  </div>
+
+  <script>
+    let input = document.getElementById("qrText");
+    let imgBox = document.getElementById("imgBox");
+    let qrImage = document.getElementById("qrImage");
+
+    function generateQR() {
+      let inputValue = input.value;
+      if (inputValue.trim() === "") return;
+
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(inputValue)}&size=150x150`;
+      imgBox.style.display = "block";
+    }
+  </script>
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure QR Code with Shared Key</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 40px;
+      text-align: center;
+      background: #f4f4f4;
+    }
+
+    input, textarea {
+      width: 80%;
+      padding: 10px;
+      margin: 10px auto;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+
+    #imgBox {
+      margin-top: 30px;
+      display: none;
+    }
+
+    img {
+      border: 3px solid #007bff;
+      background: white;
+      padding: 5px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+
+    #error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🔐 Secure QR with Shared Key</h2>
+
+  <input type="text" id="message" placeholder="Enter secret message">
+  <input type="password" id="key" placeholder="Enter shared secret key">
+  <button onclick="generateQR()">Generate QR</button>
+
+  <div id="imgBox">
+    <p>📷 Your Encrypted QR Code:</p>
+    <img id="qrImage" src="">
+  </div>
+
+  <hr>
+
+  <h3>🔓 Decrypt QR Code Data</h3>
+  <textarea id="qrData" placeholder="Paste scanned QR code content here..."></textarea>
+  <input type="password" id="keyDecrypt" placeholder="Enter same shared key">
+  <button onclick="decryptMessage()">Decrypt</button>
+
+  <p id="result"></p>
+  <p id="error"></p>
+
+  <script>
+    function generateQR() {
+      const msg = document.getElementById("message").value;
+      const key = document.getElementById("key").value;
+
+      if (!msg || !key) return alert("Message and key are required!");
+
+      const encrypted = CryptoJS.AES.encrypt(msg, key).toString();
+
+      const qrURL = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(encrypted)}&size=200x200`;
+      document.getElementById("qrImage").src = qrURL;
+      document.getElementById("imgBox").style.display = "block";
+    }
+
+    function decryptMessage() {
+      const encryptedText = document.getElementById("qrData").value.trim();
+      const key = document.getElementById("keyDecrypt").value;
+
+      if (!encryptedText || !key) return alert("Encrypted data and key are required!");
+
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedText, key);
+        const original = bytes.toString(CryptoJS.enc.Utf8);
+
+        if (!original) throw new Error("Wrong key or invalid data!");
+
+        document.getElementById("result").innerText = "Decrypted Message: " + original;
+        document.getElementById("error").innerText = "";
+      } catch (e) {
+        document.getElementById("error").innerText = "❌ Incorrect key or corrupted data.";
+        document.getElementById("result").innerText = "";
+      }
+    }
+  </script>
+
+</body>
+</html>
